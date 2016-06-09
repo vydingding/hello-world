@@ -31,7 +31,7 @@ github.authenticate({
 
 var public_spreadsheet_url = 'https://docs.google.com/spreadsheets/d/1Etze7fBNH3j4ss4-LPz_-khYRKnh0w34ScsqaJDvXtE/pubhtml';
 
-var tabletop = Tabletop.init( { key: public_spreadsheet_url, callback: createGeneral, simpleSheet: true } )
+var tabletop = Tabletop.init( { key: public_spreadsheet_url, callback: createGeneral, wanted: ["Faculty"], simpleSheet: true} )
 
   function createGeneral(data, tabletop) {
 
@@ -49,138 +49,109 @@ var tabletop = Tabletop.init( { key: public_spreadsheet_url, callback: createGen
     github.repos.createFile({
     user: "vydingding",
     repo: "vydingding.github.io",
-    path: "_data/faculty.csv",
+    path: "_data/GeneralFacultyList.csv",
     message: "Faculty list",
     content: buff
+    }, function(err, res) {    
+
+      var contents = "<html><body><h1>This is a general website.</h1><p>This is about all DCS faculty.</p> <h1> Members: </h1><ul>{% for Name in site.data.GeneralFacultyList %}<li>{{ Name.FacultyName }}-{{ Name.Age }}</li>{% endfor %}</ul></body></html>";
+      contents = new Buffer(contents.toString('base64'));
+      buffs = contents.toString('base64');
+
+
+    github.repos.createFile({
+    user: "vydingding",
+    repo: "vydingding.github.io",
+    path: "_posts/GeneralFacultyList.html",
+    message: "Faculty list HTML",
+    content: buffs       
     }, function(err, res) {
         console.log(err, res);
 
-    });
-  }
-
-  var tabletop2 = Tabletop.init( { key: public_spreadsheet_url, callback: showInfo, simpleSheet: true } )
+    var tabletop2 = Tabletop.init( { key: public_spreadsheet_url, callback: showInfo, wanted: ["Faculty"], simpleSheet: true } )
 
     function showInfo(data, tabletop2) {
 
     var fields = ['FacultyName'];
     var facultyArray = [];
 
-    console.log("Length: " + data.length);
-
-
     for(var i = 0; i < data.length; i++){
       facultyArray.push(data[i].FacultyName);
     }
 
     function createmany(facultyArr) {
-      console.log("*********************Length: " + facultyArr.length);
+
+    var sheetctr = 0;
+    var content = "<html><body><h1> " + facultyArr[0] + "</h1><p>This is about me.</p> <h1> PUBLICATIONS: </h1><ul>{% for Name in site.data.JJ Lumagbas %}<li>{{ JJ Lumagbas.Name }}-{{ JJ Lumagbas.Published }}</li>{% endfor %}</ul></body></html>";
+    content = new Buffer(content.toString('base64'));
+    newcontent = content.toString('base64');
+
       if (facultyArr.length > 0) {
+
+        console.log("*******FACULTY ARR 0 NAME: " + facultyArr[0]);
 
           github.repos.createFile({
             user: "vydingding",
             repo: "vydingding.github.io",
-            path: "_data/" + facultyArr[0] + ".html",
+            path: "_posts/" + facultyArr[0] + ".html",
             message: "Individual faculty",
-            content: "PCFET0NUWVBFIGh0bWw+DQo8aHRtbD4NCiAgPGhlYWQ+DQogICAgPHRpdGxlPnslIGlmIHBhZ2UudGl0bGUgJX17eyBwYWdlLnRpdGxlIH19IOKAkyB7JSBlbmRpZiAlfXt7IHNpdGUubmFtZSB9fSDigJMge3sgc2l0ZS5kZXNjcmlwdGlvbiB9fTwvdGl0bGU+DQoNCiAgICB7JSBpbmNsdWRlIG1ldGEuaHRtbCAlfQ0KDQogICAgPCEtLVtpZiBsdCBJRSA5XT4NCiAgICAgIDxzY3JpcHQgc3JjPSJodHRwOi8vaHRtbDVzaGl2Lmdvb2dsZWNvZGUuY29tL3N2bi90cnVuay9odG1sNS5qcyI+PC9zY3JpcHQ+DQogICAgPCFbZW5kaWZdLS0+DQoNCiAgICA8bGluayByZWw9InN0eWxlc2hlZXQiIHR5cGU9InRleHQvY3NzIiBocmVmPSJ7eyBzaXRlLmJhc2V1cmwgfX0vc3R5bGUuY3NzIiAvPg0KICAgIDxsaW5rIHJlbD0iYWx0ZXJuYXRlIiB0eXBlPSJhcHBsaWNhdGlvbi9yc3MreG1sIiB0aXRsZT0ie3sgc2l0ZS5uYW1lIH19IC0ge3sgc2l0ZS5kZXNjcmlwdGlvbiB9fSIgaHJlZj0ie3sgc2l0ZS5iYXNldXJsIH19L2ZlZWQueG1sIiAvPg0KDQogICAgPCEtLSBDcmVhdGVkIHdpdGggSmVreWxsIE5vdyAtIGh0dHA6Ly9naXRodWIuY29tL2JhcnJ5Y2xhcmsvamVreWxsLW5vdyAtLT4NCiAgPC9oZWFkPg0KDQogIDxib2R5Pg0KICAgIA0KICAgICAgICBDSEFOR0VEISEhISEhDQogICAgDQogICAgDQogICAgPGRpdiBjbGFzcz0id3JhcHBlci1tYXN0aGVhZCI+DQogICAgICA8ZGl2IGNsYXNzPSJjb250YWluZXIiPg0KICAgICAgICA8aGVhZGVyIGNsYXNzPSJtYXN0aGVhZCBjbGVhcmZpeCI+DQogICAgICAgICAgPGEgaHJlZj0ie3sgc2l0ZS5iYXNldXJsIH19LyIgY2xhc3M9InNpdGUtYXZhdGFyIj48aW1nIHNyYz0ie3sgc2l0ZS5hdmF0YXIgfX0iIC8+PC9hPg0KDQogICAgICAgICAgPGRpdiBjbGFzcz0ic2l0ZS1pbmZvIj4NCiAgICAgICAgICAgIDxoMSBjbGFzcz0ic2l0ZS1uYW1lIj48YSBocmVmPSJ7eyBzaXRlLmJhc2V1cmwgfX0vIj57eyBzaXRlLm5hbWUgfX08L2E+PC9oMT4NCiAgICAgICAgICAgIDxwIGNsYXNzPSJzaXRlLWRlc2NyaXB0aW9uIj57eyBzaXRlLmRlc2NyaXB0aW9uIH19PC9wPg0KICAgICAgICAgIDwvZGl2Pg0KDQogICAgICAgICAgPG5hdj4NCiAgICAgICAgICAgIDxhIGhyZWY9Int7IHNpdGUuYmFzZXVybCB9fS8iPkJsb2c8L2E+DQogICAgICAgICAgICA8YSBocmVmPSJ7eyBzaXRlLmJhc2V1cmwgfX0vYWJvdXQiPkFib3V0PC9hPg0KICAgICAgICAgIDwvbmF2Pg0KICAgICAgICA8L2hlYWRlcj4NCiAgICAgIDwvZGl2Pg0KICAgIDwvZGl2Pg0KDQogICAgPGRpdiBpZD0ibWFpbiIgcm9sZT0ibWFpbiIgY2xhc3M9ImNvbnRhaW5lciI+DQogICAgICB7eyBjb250ZW50IH19DQogICAgPC9kaXY+DQoNCiAgICA8ZGl2IGNsYXNzPSJ3cmFwcGVyLWZvb3RlciI+DQogICAgICA8ZGl2IGNsYXNzPSJjb250YWluZXIiPg0KICAgICAgICA8Zm9vdGVyIGNsYXNzPSJmb290ZXIiPg0KICAgICAgICAgIHslIGluY2x1ZGUgc3ZnLWljb25zLmh0bWwgJX0NCiAgICAgICAgPC9mb290ZXI+DQogICAgICA8L2Rpdj4NCiAgICA8L2Rpdj4NCg0KICAgIHslIGluY2x1ZGUgYW5hbHl0aWNzLmh0bWwgJX0NCiAgICANCg0KICA8L2JvZHk+DQo8L2h0bWw+"
+            content: newcontent
           }, function(err, res) {
+
               if (err) console.log(err);
+
+                var tabletop3 = Tabletop.init( { key: public_spreadsheet_url, callback: showInfo2, wanted: [facultyArr[0]], simpleSheet: true } )
+                
+                function showInfo2(data, tabletop3) {
+
+                   var fields = ["Name", "Published"];
+
+                    json2csv({ data: data, fields: fields }, function(err, csv) {
+                    if 
+                    (err) console.log(err);
+                    data = csv;
+                    });
+
+                    data = new Buffer(data.toString('base64'));
+                    buff = data.toString('base64');  
+
+                      github.repos.createFile({
+                      user: "vydingding",
+                      repo: "vydingding.github.io",
+                      path: "_data/" + tabletop3.model_names[sheetctr] + ".csv",
+                      message: "Individual faculty",
+                      content: buff
+
+                    }, function(err, res) {
+
+                      sheetctr++;
+                    });
+                }
+
+
               facultyArr.splice(0, 1);
               createmany(facultyArr);
           });
       }
-
     }
     createmany(facultyArray);
    }
 
+    });
+
+    });
+
+  }
+
 response.json({ message: 'Faculty list created!' });   
-});
-
-// app.get('/createfacultylist', function(request, response) {
-
-// var Client = require("./node_modules/github4/lib");
-// var Tabletop = require('./node_modules/tabletop/src/tabletop.js');
-// var json2csv = require('json2csv');
-
-// var github = new Client({
-//     debug: true
-// });
-
-// github.authenticate({
-//     type: "basic",
-//     username: "vydingding",
-//     password: "09212391013a"
-// });
-
-// var public_spreadsheet_url = 'https://docs.google.com/spreadsheets/d/1Etze7fBNH3j4ss4-LPz_-khYRKnh0w34ScsqaJDvXtE/pubhtml';
-
-// var tabletop = Tabletop.init( { key: public_spreadsheet_url, callback: createGeneral, simpleSheet: true } )
-
-//   function createGeneral(data, tabletop) {
-
-//     var fields = ['FacultyName', 'Age'];    
-
-//     json2csv({ data: data, fields: fields }, function(err, csv) {
-//       if 
-//       (err) console.log(err);
-//       data = csv;
-//     });
-
-//     data = new Buffer(data.toString('base64'));
-//     buff = data.toString('base64');
-
-//     github.repos.createFile({
-//     user: "vydingding",
-//     repo: "vydingding.github.io",
-//     path: "_data/faculty.csv",
-//     message: "Faculty list",
-//     content: buff
-//     }, function(err, res) {
-//         console.log(err, res);
-
-//         var tabletop2 = Tabletop.init( { key: public_spreadsheet_url, callback: showInfo, simpleSheet: true } )
-
-//     function showInfo(data, tabletop2) {
-
-//     var fields = ['FacultyName'];
-//     var facultyArray = [];
-
-//     console.log("Length: " + data.length);
+ });
 
 
-//     for(var i = 0; i < data.length; i++){
-//       facultyArray.push(data[i].FacultyName);
-//     }
-
-//     function createmany(facultyArr) {
-//       console.log("*********************Length: " + facultyArr.length);
-//       if (facultyArr.length > 0) {
-
-//           github.repos.createFile({
-//             user: "vydingding",
-//             repo: "vydingding.github.io",
-//             path: "_data/" + facultyArr[0] + ".html",
-//             message: "Individual faculty",
-//             content: "PCFET0NUWVBFIGh0bWw+DQo8aHRtbD4NCiAgPGhlYWQ+DQogICAgPHRpdGxlPnslIGlmIHBhZ2UudGl0bGUgJX17eyBwYWdlLnRpdGxlIH19IOKAkyB7JSBlbmRpZiAlfXt7IHNpdGUubmFtZSB9fSDigJMge3sgc2l0ZS5kZXNjcmlwdGlvbiB9fTwvdGl0bGU+DQoNCiAgICB7JSBpbmNsdWRlIG1ldGEuaHRtbCAlfQ0KDQogICAgPCEtLVtpZiBsdCBJRSA5XT4NCiAgICAgIDxzY3JpcHQgc3JjPSJodHRwOi8vaHRtbDVzaGl2Lmdvb2dsZWNvZGUuY29tL3N2bi90cnVuay9odG1sNS5qcyI+PC9zY3JpcHQ+DQogICAgPCFbZW5kaWZdLS0+DQoNCiAgICA8bGluayByZWw9InN0eWxlc2hlZXQiIHR5cGU9InRleHQvY3NzIiBocmVmPSJ7eyBzaXRlLmJhc2V1cmwgfX0vc3R5bGUuY3NzIiAvPg0KICAgIDxsaW5rIHJlbD0iYWx0ZXJuYXRlIiB0eXBlPSJhcHBsaWNhdGlvbi9yc3MreG1sIiB0aXRsZT0ie3sgc2l0ZS5uYW1lIH19IC0ge3sgc2l0ZS5kZXNjcmlwdGlvbiB9fSIgaHJlZj0ie3sgc2l0ZS5iYXNldXJsIH19L2ZlZWQueG1sIiAvPg0KDQogICAgPCEtLSBDcmVhdGVkIHdpdGggSmVreWxsIE5vdyAtIGh0dHA6Ly9naXRodWIuY29tL2JhcnJ5Y2xhcmsvamVreWxsLW5vdyAtLT4NCiAgPC9oZWFkPg0KDQogIDxib2R5Pg0KICAgIA0KICAgICAgICBDSEFOR0VEISEhISEhDQogICAgDQogICAgDQogICAgPGRpdiBjbGFzcz0id3JhcHBlci1tYXN0aGVhZCI+DQogICAgICA8ZGl2IGNsYXNzPSJjb250YWluZXIiPg0KICAgICAgICA8aGVhZGVyIGNsYXNzPSJtYXN0aGVhZCBjbGVhcmZpeCI+DQogICAgICAgICAgPGEgaHJlZj0ie3sgc2l0ZS5iYXNldXJsIH19LyIgY2xhc3M9InNpdGUtYXZhdGFyIj48aW1nIHNyYz0ie3sgc2l0ZS5hdmF0YXIgfX0iIC8+PC9hPg0KDQogICAgICAgICAgPGRpdiBjbGFzcz0ic2l0ZS1pbmZvIj4NCiAgICAgICAgICAgIDxoMSBjbGFzcz0ic2l0ZS1uYW1lIj48YSBocmVmPSJ7eyBzaXRlLmJhc2V1cmwgfX0vIj57eyBzaXRlLm5hbWUgfX08L2E+PC9oMT4NCiAgICAgICAgICAgIDxwIGNsYXNzPSJzaXRlLWRlc2NyaXB0aW9uIj57eyBzaXRlLmRlc2NyaXB0aW9uIH19PC9wPg0KICAgICAgICAgIDwvZGl2Pg0KDQogICAgICAgICAgPG5hdj4NCiAgICAgICAgICAgIDxhIGhyZWY9Int7IHNpdGUuYmFzZXVybCB9fS8iPkJsb2c8L2E+DQogICAgICAgICAgICA8YSBocmVmPSJ7eyBzaXRlLmJhc2V1cmwgfX0vYWJvdXQiPkFib3V0PC9hPg0KICAgICAgICAgIDwvbmF2Pg0KICAgICAgICA8L2hlYWRlcj4NCiAgICAgIDwvZGl2Pg0KICAgIDwvZGl2Pg0KDQogICAgPGRpdiBpZD0ibWFpbiIgcm9sZT0ibWFpbiIgY2xhc3M9ImNvbnRhaW5lciI+DQogICAgICB7eyBjb250ZW50IH19DQogICAgPC9kaXY+DQoNCiAgICA8ZGl2IGNsYXNzPSJ3cmFwcGVyLWZvb3RlciI+DQogICAgICA8ZGl2IGNsYXNzPSJjb250YWluZXIiPg0KICAgICAgICA8Zm9vdGVyIGNsYXNzPSJmb290ZXIiPg0KICAgICAgICAgIHslIGluY2x1ZGUgc3ZnLWljb25zLmh0bWwgJX0NCiAgICAgICAgPC9mb290ZXI+DQogICAgICA8L2Rpdj4NCiAgICA8L2Rpdj4NCg0KICAgIHslIGluY2x1ZGUgYW5hbHl0aWNzLmh0bWwgJX0NCiAgICANCg0KICA8L2JvZHk+DQo8L2h0bWw+"
-//           }, function(err, res) {
-//               if (err) console.log(err);
-//               facultyArr.splice(0, 1);
-//               createmany(facultyArr);
-//           });
-//       }
-
-//     }
-//     createmany(facultyArray);
-//    }
-
-//     });
-//   }
-// response.json({ message: 'Faculty list created!' });   
-// });
 
 app.listen(app.get('port'), function() {
   console.log('Node app is running on port', app.get('port'));
 });
+
 
 app.get('/updatefacultylist', function(request, response) {
 
@@ -205,12 +176,12 @@ var pastfile = "";
 
     user: "vydingding",
     repo: "vydingding.github.io",
-    path: "_data/faculty.csv"
+    path: "_data/GeneralFacultyList.csv"
     }, function(err, res) {
     pastfile = res.sha;
 
     var public_spreadsheet_url = 'https://docs.google.com/spreadsheets/d/1Etze7fBNH3j4ss4-LPz_-khYRKnh0w34ScsqaJDvXtE/pubhtml';
-    var tabletop = Tabletop.init( { key: public_spreadsheet_url, callback: showInfo, simpleSheet: true } )
+    var tabletop = Tabletop.init( { key: public_spreadsheet_url, callback: showInfo, wanted:["Faculty"], simpleSheet: true } )
 
     function showInfo(data, tabletop) {
 
@@ -229,74 +200,342 @@ var pastfile = "";
 
     user: "vydingding",
     repo: "vydingding.github.io",
-    path: "_data/faculty.csv",
-    message: "Faculty list change",
+    path: "_data/GeneralFacultyList.csv",
+    message: "JJ change 2",
     content: buff,
     sha: pastfile
     }, function(err, res) {
-    response.json({ message: 'Update file successful!'});   
-    });
+
+
+    var tabletop2 = Tabletop.init( { key: public_spreadsheet_url, callback: showInfo, wanted: ["Faculty"], simpleSheet: true } )
+
+    function showInfo(data, tabletop2) {
+
+    var fields = ['FacultyName'];
+    var facultyArray = [];
+    var ageArray = []; //sudlan ug age, ibutang sa content, and lesgo
+
+    for(var i = 0; i < data.length; i++){
+      facultyArray.push(data[i].FacultyName);
+      ageArray.push(data[i].Age);
+    }      
+
+    function updatemany(facultyArr, ageArr) {
+
+    var sheetctr = 0;
+    var pastindi = "";
+
+    github.repos.getContent({
+
+    user: "vydingding",
+    repo: "vydingding.github.io",
+    path: "_posts/" + facultyArr[0] + ".html"
+    }, function(err, res) {
+      
+    console.log("********DATA: ", res);  
+    pastindi = res.sha;
+
+    var content = "<html><body><h1> " + facultyArr[0] + "</h1><p>This is about me.</p>" +  "I am " + ageArr[0] + "<h1> PUBLICATIONS: </h1><ul>{% for Name in site.data.JJ Lumagbas %}<li>{{ JJ Lumagbas.Name }}-{{ JJ Lumagbas.Published }}</li>{% endfor %}</ul></body></html>";
+    content = new Buffer(content.toString('base64'));
+    newcontent = content.toString('base64');
+
+      if (facultyArr.length > 0) {
+
+          github.repos.updateFile({
+            user: "vydingding",
+            repo: "vydingding.github.io",
+            path: "_posts/" + facultyArr[0] + ".html",
+            message: "Updated faculty info",
+            content: newcontent,
+            sha: pastindi
+          }, function(err, res) {
+
+              if (err) console.log(err);
+
+          github.repos.getContent({
+
+          user: "vydingding",
+          repo: "vydingding.github.io",
+          path: "_data/" + facultyArr[0] + ".csv"
+          }, function(err, res) {
+
+          pastindi = res.sha;
+
+          console.log("*******UPDATING CSV OF: " + facultyArr[0]);
+               
+                var tabletop3 = Tabletop.init( { key: public_spreadsheet_url, callback: showInfo2, wanted: [facultyArr[0]], simpleSheet: true } )
+                
+                function showInfo2(data, tabletop3) {
+
+                   var fields = ["Name", "Published"];
+
+                    json2csv({ data: data, fields: fields }, function(err, csv) {
+                    if 
+                    (err) console.log(err);
+                    data = csv;
+                    });
+
+                    data = new Buffer(data.toString('base64'));
+                    buff = data.toString('base64');  
+
+                      github.repos.updateFile({
+                      user: "vydingding",
+                      repo: "vydingding.github.io",
+                      path: "_data/" + tabletop3.model_names[sheetctr] + ".csv",
+                      message: "Updates publication CSV",
+                      content: buff,
+                      sha: pastindi
+
+                    }, function(err, res) {
+                      sheetctr++;
+
+                      facultyArr.splice(0, 1);
+                      ageArr.splice(0,1);
+                      updatemany(facultyArr, ageArr);
+                    });
+                }
+
+
+          });
+
+          });
+          
+          } 
+
+         });      
+
+        }
+
+        updatemany(facultyArray, ageArray); 
+
+
+
     }
     });
 
+    }
 
+    });
+
+
+response.json({ message: 'Updating of files successful!' });   
 });
 
-// app.get('/createindividualfaculty', function(request, response) {
+app.get('/deletefacultylist', function(request, response) {
+
+var Client = require("./node_modules/github4/lib");
+var Tabletop = require('./node_modules/tabletop/src/tabletop.js');
+//var testAuth = require("./../test_auth.json");
+var json2csv = require('json2csv');
+
+var github = new Client({
+    debug: true
+});
+
+github.authenticate({
+    type: "basic",
+    username: "vydingding",
+    password: "09212391013a"
+});
+
+var pastfile = "";
+
+    var tabletop2 = Tabletop.init( { key: public_spreadsheet_url, callback: showInfo, wanted: ["Faculty"], simpleSheet: true } )
+
+    function showInfo(data, tabletop2) {
+
+    var fields = ['FacultyName'];
+    var facultyArray = [];
+    var ageArray = []; //sudlan ug age, ibutang sa content, and lesgo
+
+    for(var i = 0; i < data.length; i++){
+      facultyArray.push(data[i].FacultyName);
+      ageArray.push(data[i].Age);
+    }      
+
+    function deletemany(facultyArr, ageArr) {
+
+    var sheetctr = 0;
+    var pastindi = "";
+
+    github.repos.getContent({
+
+    user: "vydingding",
+    repo: "vydingding.github.io",
+    path: "_posts/" + facultyArr[0] + ".html"
+    }, function(err, res) {
+      
+    console.log("********DATA: ", res);  
+    pastindi = res.sha;
+
+    var content = "<html><body><h1> " + facultyArr[0] + "</h1><p>This is about me.</p>" +  "I am " + ageArr[0] + "<h1> PUBLICATIONS: </h1><ul>{% for Name in site.data.JJ Lumagbas %}<li>{{ JJ Lumagbas.Name }}-{{ JJ Lumagbas.Published }}</li>{% endfor %}</ul></body></html>";
+    content = new Buffer(content.toString('base64'));
+    newcontent = content.toString('base64');
+
+      if (facultyArr.length > 0) {
+
+          github.repos.updateFile({
+            user: "vydingding",
+            repo: "vydingding.github.io",
+            path: "_posts/" + facultyArr[0] + ".html",
+            message: "Updated faculty info",
+            content: newcontent,
+            sha: pastindi
+          }, function(err, res) {
+
+          github.repos.getContent({
+
+          user: "vydingding",
+          repo: "vydingding.github.io",
+          path: "_data/" + facultyArr[0] + ".csv"
+          }, function(err, res) {
+
+          pastindi = res.sha;
+
+          console.log("*******UPDATING CSV OF: " + facultyArr[0]);
+               
+                var tabletop3 = Tabletop.init( { key: public_spreadsheet_url, callback: showInfo2, wanted: [facultyArr[0]], simpleSheet: true } )
+                
+                function showInfo2(data, tabletop3) {
+
+                   var fields = ["Name", "Published"];
+
+                    json2csv({ data: data, fields: fields }, function(err, csv) {
+                    if 
+                    (err) console.log(err);
+                    data = csv;
+                    });
+
+                    data = new Buffer(data.toString('base64'));
+                    buff = data.toString('base64');  
+
+                      github.repos.updateFile({
+                      user: "vydingding",
+                      repo: "vydingding.github.io",
+                      path: "_data/" + tabletop3.model_names[sheetctr] + ".csv",
+                      message: "Updates publication CSV",
+                      content: buff,
+                      sha: pastindi
+
+                    }, function(err, res) {
+                      sheetctr++;
+                      facultyArr.splice(0, 1);
+                      ageArr.splice(0,1);
+                      updatemany(facultyArr, ageArr);
+                    });
+                }
+
+          });
+
+          });
+          
+          } 
+
+         });      
+
+        }
+
+        updatemany(facultyArray, ageArray); 
+    }
 
 
-// var Client = require("./node_modules/github4/lib");
-// var Tabletop = require('./node_modules/tabletop/src/tabletop.js');
-// //var testAuth = require("./../test_auth.json");
-// var json2csv = require('json2csv');
-
-// var github = new Client({
-//     debug: true
-// });
-
-// github.authenticate({
-//     type: "basic",
-//     username: "vydingding",
-//     password: "09212391013a"
-// });
-
-// // var public_spreadsheet_url = 'https://docs.google.com/spreadsheets/d/1Etze7fBNH3j4ss4-LPz_-khYRKnh0w34ScsqaJDvXtE/pubhtml';
-// // var tabletop = Tabletop.init( { key: public_spreadsheet_url, callback: showInfo, simpleSheet: true } )
-
-// //   function showInfo(data, tabletop) {
-
-// //     var fields = ['FacultyName'];
-// //     var facultyArray = [];
-
-// //     console.log("Length: " + data.length);
+response.json({ message: 'Delete file successful!' });   
+});
 
 
-// //     for(var i = 0; i < data.length; i++){
-// //       facultyArray.push(data[i].FacultyName);
-// //     }
 
-// //     function createmany(facultyArr) {
-// //       console.log("*********************Length: " + facultyArr.length);
-// //       if (facultyArr.length > 0) {
+app.get('/test', function(request, response) {
 
-// //           github.repos.createFile({
-// //             user: "vydingding",
-// //             repo: "vydingding.github.io",
-// //             path: "_data/" + facultyArr[0] + ".html",
-// //             message: "Individual faculty",
-// //             content: "PCFET0NUWVBFIGh0bWw+DQo8aHRtbD4NCiAgPGhlYWQ+DQogICAgPHRpdGxlPnslIGlmIHBhZ2UudGl0bGUgJX17eyBwYWdlLnRpdGxlIH19IOKAkyB7JSBlbmRpZiAlfXt7IHNpdGUubmFtZSB9fSDigJMge3sgc2l0ZS5kZXNjcmlwdGlvbiB9fTwvdGl0bGU+DQoNCiAgICB7JSBpbmNsdWRlIG1ldGEuaHRtbCAlfQ0KDQogICAgPCEtLVtpZiBsdCBJRSA5XT4NCiAgICAgIDxzY3JpcHQgc3JjPSJodHRwOi8vaHRtbDVzaGl2Lmdvb2dsZWNvZGUuY29tL3N2bi90cnVuay9odG1sNS5qcyI+PC9zY3JpcHQ+DQogICAgPCFbZW5kaWZdLS0+DQoNCiAgICA8bGluayByZWw9InN0eWxlc2hlZXQiIHR5cGU9InRleHQvY3NzIiBocmVmPSJ7eyBzaXRlLmJhc2V1cmwgfX0vc3R5bGUuY3NzIiAvPg0KICAgIDxsaW5rIHJlbD0iYWx0ZXJuYXRlIiB0eXBlPSJhcHBsaWNhdGlvbi9yc3MreG1sIiB0aXRsZT0ie3sgc2l0ZS5uYW1lIH19IC0ge3sgc2l0ZS5kZXNjcmlwdGlvbiB9fSIgaHJlZj0ie3sgc2l0ZS5iYXNldXJsIH19L2ZlZWQueG1sIiAvPg0KDQogICAgPCEtLSBDcmVhdGVkIHdpdGggSmVreWxsIE5vdyAtIGh0dHA6Ly9naXRodWIuY29tL2JhcnJ5Y2xhcmsvamVreWxsLW5vdyAtLT4NCiAgPC9oZWFkPg0KDQogIDxib2R5Pg0KICAgIA0KICAgICAgICBDSEFOR0VEISEhISEhDQogICAgDQogICAgDQogICAgPGRpdiBjbGFzcz0id3JhcHBlci1tYXN0aGVhZCI+DQogICAgICA8ZGl2IGNsYXNzPSJjb250YWluZXIiPg0KICAgICAgICA8aGVhZGVyIGNsYXNzPSJtYXN0aGVhZCBjbGVhcmZpeCI+DQogICAgICAgICAgPGEgaHJlZj0ie3sgc2l0ZS5iYXNldXJsIH19LyIgY2xhc3M9InNpdGUtYXZhdGFyIj48aW1nIHNyYz0ie3sgc2l0ZS5hdmF0YXIgfX0iIC8+PC9hPg0KDQogICAgICAgICAgPGRpdiBjbGFzcz0ic2l0ZS1pbmZvIj4NCiAgICAgICAgICAgIDxoMSBjbGFzcz0ic2l0ZS1uYW1lIj48YSBocmVmPSJ7eyBzaXRlLmJhc2V1cmwgfX0vIj57eyBzaXRlLm5hbWUgfX08L2E+PC9oMT4NCiAgICAgICAgICAgIDxwIGNsYXNzPSJzaXRlLWRlc2NyaXB0aW9uIj57eyBzaXRlLmRlc2NyaXB0aW9uIH19PC9wPg0KICAgICAgICAgIDwvZGl2Pg0KDQogICAgICAgICAgPG5hdj4NCiAgICAgICAgICAgIDxhIGhyZWY9Int7IHNpdGUuYmFzZXVybCB9fS8iPkJsb2c8L2E+DQogICAgICAgICAgICA8YSBocmVmPSJ7eyBzaXRlLmJhc2V1cmwgfX0vYWJvdXQiPkFib3V0PC9hPg0KICAgICAgICAgIDwvbmF2Pg0KICAgICAgICA8L2hlYWRlcj4NCiAgICAgIDwvZGl2Pg0KICAgIDwvZGl2Pg0KDQogICAgPGRpdiBpZD0ibWFpbiIgcm9sZT0ibWFpbiIgY2xhc3M9ImNvbnRhaW5lciI+DQogICAgICB7eyBjb250ZW50IH19DQogICAgPC9kaXY+DQoNCiAgICA8ZGl2IGNsYXNzPSJ3cmFwcGVyLWZvb3RlciI+DQogICAgICA8ZGl2IGNsYXNzPSJjb250YWluZXIiPg0KICAgICAgICA8Zm9vdGVyIGNsYXNzPSJmb290ZXIiPg0KICAgICAgICAgIHslIGluY2x1ZGUgc3ZnLWljb25zLmh0bWwgJX0NCiAgICAgICAgPC9mb290ZXI+DQogICAgICA8L2Rpdj4NCiAgICA8L2Rpdj4NCg0KICAgIHslIGluY2x1ZGUgYW5hbHl0aWNzLmh0bWwgJX0NCiAgICANCg0KICA8L2JvZHk+DQo8L2h0bWw+"
-// //           }, function(err, res) {
-// //               if (err) console.log(err);
-// //               facultyArr.splice(0, 1);
-// //               createmany(facultyArr);
-// //           });
-// //       }
+var Client = require("./node_modules/github4/lib");
+var Tabletop = require('./node_modules/tabletop/src/tabletop.js');
+//var testAuth = require("./../test_auth.json");
+var json2csv = require('json2csv');
 
-// //     }
-// //     createmany(facultyArray);
-// //   }
+var github = new Client({
+    debug: true
+});
 
-// // response.json({ message: 'Individual faculty html created!' });   
-// // });
+github.authenticate({
+    type: "basic",
+    username: "vydingding",
+    password: "09212391013a"
+});
 
-//sa delete individual html of faculty, just compare while data.facultyName equals something in that repo, dont delete, and if it doesn't, delete it
+
+//if data[i].name kay gaexist, nothing then if -1, deletefile
+
+github.repos.getContent({
+
+          user: "vydingding",
+          repo: "vydingding.github.io",
+          path: "_data/GeneralFacultyList.csv"
+          }, function(err, res) {
+
+
+           // console.log("*****DATA: ", res[1].name);
+
+            var stringified = JSON.stringify(res);
+            var b64string = res.content;
+            var buff = new Buffer(b64string, 'base64');
+            var stringified = buff.toString();
+
+              github.repos.getContent({
+
+              user: "vydingding",
+              repo: "vydingding.github.io",
+              path: "_posts"
+              }, function(err, res) {   
+
+                for(var i = 0; i < res.length; i++){
+
+                var filename = res[i].name;
+                filename = filename.substring(0, (filename.length - 5));  
+
+                  if(stringified.search(filename) != -1 || filename == "GeneralFacultyList"){
+                    console.log("Number " + i +  "," + filename + ": FOUND!\n" + stringified.search(filename));
+                  }
+
+                  else{
+                    console.log(filename + " is not found! It will be deleted.");
+
+                      github.repos.deleteFile({
+
+                      user: "vydingding",
+                      repo: "vydingding.github.io",
+                      path: "_posts/" + filename + ".html",
+                      message: "Deleted " + filename + ".html",
+                      sha: res[i].sha
+                      }, function(err, ress) { 
+
+                      });
+
+                      github.repos.getContent({
+
+                                user: "vydingding",
+                                repo: "vydingding.github.io",
+                                path: "_data/" + filename + ".csv"
+                      }, function(err, res) {
+
+                      github.repos.deleteFile({
+
+                      user: "vydingding",
+                      repo: "vydingding.github.io",
+                      path: "_posts/" + filename + ".html",
+                      message: "Deleted " + filename + ".html",
+                      sha: res.sha
+                      }, function(err, ress) { 
+
+                      });
+
+                    });
+                  }
+                }
+
+              });       
+
+         });
+
+
+
+response.json({ message: 'Test successful!' });   
+});
